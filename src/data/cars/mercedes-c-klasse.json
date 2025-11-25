@@ -1,0 +1,9 @@
+{
+  "name": "Mercedes C-Klasse",
+  "description": "Elegante Mercedes C-Klasse mit modernem Infotainment und komfortablem Interieur.",
+  "price": "€32.000",
+  "year": 2019,
+  "images": [
+    "src/uploads/mercedes-c-klasse-1.jpg"
+  ]
+}

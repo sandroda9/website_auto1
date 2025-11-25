@@ -1,0 +1,11 @@
+{
+  "name": "Audi A4",
+  "description": "Technisch hochwertig ausgestatteter Audi A4. Minimale Laufleistung, praktisch wie neu.",
+  "price": "€30.500",
+  "year": 2021,
+  "images": [
+    "src/uploads/audi-a4-1.jpg",
+    "src/uploads/audi-a4-2.jpg",
+    "src/uploads/audi-a4-3.jpg"
+  ]
+}

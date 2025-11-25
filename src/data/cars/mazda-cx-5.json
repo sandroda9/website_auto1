@@ -1,0 +1,10 @@
+{
+  "name": "Mazda CX-5",
+  "description": "Moderner SUV mit Allradantrieb. Dynamisch und komfortabel, perfekt für Familienausflüge.",
+  "price": "€35.000",
+  "year": 2021,
+  "images": [
+    "src/uploads/mazda-cx-5-1.jpg",
+    "src/uploads/mazda-cx-5-2.jpg"
+  ]
+}

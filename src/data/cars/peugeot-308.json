@@ -1,0 +1,11 @@
+{
+  "name": "Peugeot 308",
+  "description": "Französischer Flair mit moderner Technik. Komfortabel und elegant mit großer Zuladung.",
+  "price": "€20.500",
+  "year": 2019,
+  "images": [
+    "src/uploads/peugeot-308-1.jpg",
+    "src/uploads/peugeot-308-2.jpg",
+    "src/uploads/peugeot-308-3.jpg"
+  ]
+}

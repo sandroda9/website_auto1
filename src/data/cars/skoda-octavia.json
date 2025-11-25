@@ -1,0 +1,10 @@
+{
+  "name": "Skoda Octavia",
+  "description": "Großzügiges Raumangebot mit tschechischer Ingenieurkunst. Sehr gutes Preis-Leistungs-Verhältnis.",
+  "price": "€22.000",
+  "year": 2020,
+  "images": [
+    "src/uploads/skoda-octavia-1.jpg",
+    "src/uploads/skoda-octavia-2.jpg"
+  ]
+}

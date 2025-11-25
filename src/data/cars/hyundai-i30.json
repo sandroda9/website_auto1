@@ -1,0 +1,9 @@
+{
+  "name": "Hyundai i30",
+  "description": "Moderner Hyundai i30 mit guter Ausstattung und 5 Jahren Garantie Restlaufzeit.",
+  "price": "€17.800",
+  "year": 2020,
+  "images": [
+    "src/uploads/hyundai-i30-1.jpg"
+  ]
+}

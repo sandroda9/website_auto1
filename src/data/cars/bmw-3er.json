@@ -1,0 +1,10 @@
+{
+  "name": "BMW 3er",
+  "description": "Gepflegter BMW 3er mit vollständiger Wartungshistorie. Sehr guter Zustand, regelmäßig gewartet.",
+  "price": "€28.500",
+  "year": 2020,
+  "images": [
+    "src/uploads/bmw-3er-1.jpg",
+    "src/uploads/bmw-3er-2.jpg"
+  ]
+}
