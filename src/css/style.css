@@ -1,0 +1,177 @@
+/* Custom Styles - One Pager */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --dark-color: #212529;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav .nav-link {
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+    color: white;
+}
+
+.hero-section h1 {
+    color: white;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-section .lead {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.5rem;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.hero-section .btn {
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+/* Sections */
+section {
+    scroll-margin-top: 70px;
+}
+
+h2 {
+    color: var(--dark-color);
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* List styles */
+.list-unstyled li {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* Form */
+#contactForm {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-control {
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Footer */
+footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    h2 {
+        font-size: 1.75rem;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section .lead {
+        font-size: 1.1rem;
+    }
+
+    section {
+        padding: 3rem 1rem;
+    }
+
+    #contactForm {
+        padding: 1.5rem;
+    }
+}

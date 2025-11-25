@@ -1,0 +1,201 @@
+/* Cars Page Styles */
+
+.cars-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cars-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.cars-header .lead {
+    font-size: 1.25rem;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Filter Section */
+.form-control,
+.form-select {
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Car Card Styles */
+.car-card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.car-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.car-images {
+    position: relative;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    height: 250px;
+}
+
+.car-images img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+    transition: transform 0.3s ease;
+}
+
+.car-card:hover .car-images img {
+    transform: scale(1.05);
+}
+
+/* Carousel Styles */
+.carousel {
+    height: 250px;
+}
+
+.carousel-item {
+    height: 250px;
+}
+
+.carousel-item img {
+    object-fit: cover;
+    height: 100%;
+}
+
+.carousel-indicators {
+    background-color: rgba(0, 0, 0, 0.3);
+    position: absolute;
+    bottom: 10px;
+}
+
+.carousel-indicators [data-bs-slide-to] {
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 4px;
+}
+
+.carousel-indicators .active {
+    background-color: white;
+}
+
+/* Card Body */
+.card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title {
+    color: #212529;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.car-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.car-meta .badge {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.card-text {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    flex-grow: 1;
+    margin-bottom: 0.75rem;
+}
+
+.car-images-count {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 0.5rem;
+}
+
+/* Card Footer */
+.card-footer {
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: none;
+}
+
+/* No Results */
+.alert-info {
+    background-color: #e7f3ff;
+    border-color: #b3d9ff;
+    color: #004085;
+    text-align: center;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cars-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .cars-header .lead {
+        font-size: 1rem;
+    }
+
+    .car-images,
+    .carousel,
+    .carousel-item {
+        height: 200px;
+    }
+
+    .car-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.car-card {
+    animation: fadeIn 0.5s ease-out;
+}
