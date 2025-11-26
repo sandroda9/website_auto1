@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/fireba
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
-// 🔑 Firebase Config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
@@ -26,10 +26,11 @@ const loginMsg = document.getElementById("loginMsg");
 const addCarBtn = document.getElementById("addCarBtn");
 const carList = document.getElementById("carList");
 
-// ✅ Login
+// LOGIN
 loginBtn.addEventListener("click", async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
+
     try {
         await signInWithEmailAndPassword(auth, email, password);
         loginSection.style.display = "none";
@@ -40,28 +41,30 @@ loginBtn.addEventListener("click", async () => {
     }
 });
 
-// ✅ Logout
+// LOGOUT
 logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
     panelSection.style.display = "none";
     loginSection.style.display = "block";
 });
 
-// ✅ Add Auto (mit Bild-URLs statt File Upload)
+// AUTO HINZUFÜGEN (mit Bild-URLs)
 addCarBtn.addEventListener("click", async () => {
     const name = document.getElementById("carName").value;
     const year = document.getElementById("carYear").value;
     const price = document.getElementById("carPrice").value;
     const description = document.getElementById("carDescription").value;
-
-    // Bild-URLs (durch Komma getrennt)
     const imageUrlsRaw = document.getElementById("carImageUrls").value;
+
     const imageUrls = imageUrlsRaw
         .split(",")
         .map(url => url.trim())
-        .filter(url => url.length > 0);
+        .filter(url => url !== "");
 
-    if (!name || !year || !price) return alert("Bitte Titel, Jahr und Preis eingeben");
+    if (!name || !year || !price) {
+        alert("Bitte Titel, Jahr und Preis eingeben");
+        return;
+    }
 
     await addDoc(collection(db, "cars"), {
         name,
@@ -81,27 +84,30 @@ addCarBtn.addEventListener("click", async () => {
     loadCars();
 });
 
-// ✅ Load Cars
+// LISTE LADEN
 async function loadCars() {
     carList.innerHTML = "";
+
     const querySnapshot = await getDocs(collection(db, "cars"));
-    querySnapshot.forEach((docSnap) => {
+
+    querySnapshot.forEach(docSnap => {
         const data = docSnap.data();
+
         const li = document.createElement("li");
         li.classList.add("list-group-item");
 
         li.innerHTML = `
             <strong>${data.name}</strong> (${data.year}) - ${data.price} €<br>
             ${data.description}<br>
-            ${data.images && data.images.length > 0
-                ? data.images.map(url => `<img src="${url}" width="100">`).join(' ')
+            ${
+                data.images && data.images.length > 0
+                ? data.images.map(url => `<img src="${url}" width="100" class="me-2 mt-2">`).join("")
                 : "<span class='text-muted'>Kein Bild</span>"
             }
             <button class="btn btn-sm btn-danger float-end mt-2">Löschen</button>
         `;
 
-        const btn = li.querySelector("button");
-        btn.addEventListener("click", async () => {
+        li.querySelector("button").addEventListener("click", async () => {
             await deleteDoc(doc(db, "cars", docSnap.id));
             loadCars();
         });
