@@ -174,4 +174,10 @@ footer {
     #contactForm {
         padding: 1.5rem;
     }
+
+    body { font-family: Arial; padding: 20px; }
+input, textarea, button { margin: 5px 0; width: 100%; max-width: 400px; }
+button { padding: 10px; cursor: pointer; }
+#carsList div { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+
 }
