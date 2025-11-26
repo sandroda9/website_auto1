@@ -3,37 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
-  <link rel="stylesheet" href="css/style.css">
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <title>Admin Panel - Auto1</title>
+  <link rel="stylesheet" href="../src/css/style.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; }
+    input, textarea, button { display:block; margin:10px 0; padding:8px; width:300px; }
+    #carList div { border:1px solid #ccc; padding:10px; margin:10px 0; }
+  </style>
 </head>
 <body>
 
-  <div id="loginDiv">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="E-Mail"><br>
-    <input type="password" id="password" placeholder="Passwort"><br>
-    <button id="loginBtn">Login</button>
-  </div>
+<h1>Admin Panel</h1>
 
-  <div id="adminPanel" style="display:none;">
-    <h2>Auto hinzufügen</h2>
-    <input type="text" id="name" placeholder="Titel"><br>
-    <textarea id="description" placeholder="Beschreibung"></textarea><br>
-    <input type="number" id="price" placeholder="Preis"><br>
-    <input type="number" id="year" placeholder="Jahr"><br>
-    <input type="file" id="images" multiple><br>
-    <button id="addCarBtn">Auto hinzufügen</button>
+<!-- Login -->
+<form id="loginForm">
+  <h2>Login</h2>
+  <input type="email" id="email" placeholder="E-Mail" required>
+  <input type="password" id="password" placeholder="Passwort" required>
+  <button type="submit">Login</button>
+</form>
 
-    <h2>Autos verwalten</h2>
-    <div id="carsList"></div>
-  </div>
+<!-- Add Car -->
+<form id="addCarForm" style="display:none;">
+  <h2>Neues Auto hinzufügen</h2>
+  <input type="text" id="carName" placeholder="Titel" required>
+  <textarea id="carDescription" placeholder="Beschreibung" required></textarea>
+  <input type="number" id="carYear" placeholder="Jahr" required>
+  <input type="text" id="carPrice" placeholder="Preis" required>
+  <input type="file" id="carImages" multiple>
+  <button type="submit">Auto hinzufügen</button>
+</form>
 
-  <script src="js/admin.js"></script>
+<h2>Autos verwalten</h2>
+<div id="carList"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
+<!-- Admin JS -->
+<script src="../src/js/admin.js"></script>
+
 </body>
 </html>
