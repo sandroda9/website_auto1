@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <div id="loginDiv">
+    <h2>Admin Login</h2>
+    <input type="email" id="email" placeholder="E-Mail"><br>
+    <input type="password" id="password" placeholder="Passwort"><br>
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <div id="adminPanel" style="display:none;">
+    <h2>Auto hinzufügen</h2>
+    <input type="text" id="name" placeholder="Titel"><br>
+    <textarea id="description" placeholder="Beschreibung"></textarea><br>
+    <input type="number" id="price" placeholder="Preis"><br>
+    <input type="number" id="year" placeholder="Jahr"><br>
+    <input type="file" id="images" multiple><br>
+    <button id="addCarBtn">Auto hinzufügen</button>
+
+    <h2>Autos verwalten</h2>
+    <div id="carsList"></div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
