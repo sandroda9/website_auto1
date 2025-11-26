@@ -1,9 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
 
-// 🔑 Firebase Config (prüfe, dass sie korrekt ist!)
+// 🔑 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
@@ -17,7 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // DOM
 const loginSection = document.getElementById("loginSection");
@@ -49,33 +47,37 @@ logoutBtn.addEventListener("click", async () => {
     loginSection.style.display = "block";
 });
 
-// ✅ Add Auto
+// ✅ Add Auto (mit Bild-URLs statt File Upload)
 addCarBtn.addEventListener("click", async () => {
     const name = document.getElementById("carName").value;
     const year = document.getElementById("carYear").value;
     const price = document.getElementById("carPrice").value;
     const description = document.getElementById("carDescription").value;
-    const files = document.getElementById("carImages").files;
+
+    // Bild-URLs (durch Komma getrennt)
+    const imageUrlsRaw = document.getElementById("carImageUrls").value;
+    const imageUrls = imageUrlsRaw
+        .split(",")
+        .map(url => url.trim())
+        .filter(url => url.length > 0);
 
     if (!name || !year || !price) return alert("Bitte Titel, Jahr und Preis eingeben");
 
-    const imageUrls = [];
-    for (let file of files) {
-        const storageRef = ref(storage, `cars/${file.name}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        imageUrls.push(url);
-    }
-
     await addDoc(collection(db, "cars"), {
-        name, year, price, description, images: imageUrls
+        name,
+        year,
+        price,
+        description,
+        images: imageUrls
     });
 
+    // Felder leeren
     document.getElementById("carName").value = "";
     document.getElementById("carYear").value = "";
     document.getElementById("carPrice").value = "";
     document.getElementById("carDescription").value = "";
-    document.getElementById("carImages").value = "";
+    document.getElementById("carImageUrls").value = "";
+
     loadCars();
 });
 
@@ -87,17 +89,23 @@ async function loadCars() {
         const data = docSnap.data();
         const li = document.createElement("li");
         li.classList.add("list-group-item");
+
         li.innerHTML = `
             <strong>${data.name}</strong> (${data.year}) - ${data.price} €<br>
             ${data.description}<br>
-            ${data.images.map(url => `<img src="${url}" width="100">`).join(' ')}
-            <button class="btn btn-sm btn-danger float-end">Löschen</button>
+            ${data.images && data.images.length > 0
+                ? data.images.map(url => `<img src="${url}" width="100">`).join(' ')
+                : "<span class='text-muted'>Kein Bild</span>"
+            }
+            <button class="btn btn-sm btn-danger float-end mt-2">Löschen</button>
         `;
+
         const btn = li.querySelector("button");
         btn.addEventListener("click", async () => {
             await deleteDoc(doc(db, "cars", docSnap.id));
             loadCars();
         });
+
         carList.appendChild(li);
     });
 }
