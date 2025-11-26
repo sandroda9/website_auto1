@@ -3,7 +3,7 @@ import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstati
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
 
-// 🔑 Firebase Config
+// 🔑 Firebase Config (prüfe, dass sie korrekt ist!)
 const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
