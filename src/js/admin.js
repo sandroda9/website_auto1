@@ -1,80 +1,103 @@
-// Firebase-Konfiguration
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
+
+// 🔑 Firebase Config
 const firebaseConfig = {
-  apiKey: "DEIN_API_KEY",
+  apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
   projectId: "webseiteauto1",
   storageBucket: "webseiteauto1.appspot.com",
-  messagingSenderId: "DEIN_MESSAGING_ID",
-  appId: "DEIN_APP_ID"
+  messagingSenderId: "156599830482",
+  appId: "1:156599830482:web:9bc6a34adfa174c58b6a0b"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+// DOM
+const loginSection = document.getElementById("loginSection");
+const panelSection = document.getElementById("panelSection");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const loginMsg = document.getElementById("loginMsg");
+const addCarBtn = document.getElementById("addCarBtn");
+const carList = document.getElementById("carList");
 
-// Login
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    document.getElementById("loginForm").style.display = "none";
-    document.getElementById("addCarForm").style.display = "block";
-    loadCars();
-  } catch (err) {
-    alert("Fehler: " + err.message);
-  }
+// ✅ Login
+loginBtn.addEventListener("click", async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        loginSection.style.display = "none";
+        panelSection.style.display = "block";
+        loadCars();
+    } catch (err) {
+        loginMsg.textContent = err.message;
+    }
 });
 
-// Autos laden
+// ✅ Logout
+logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    panelSection.style.display = "none";
+    loginSection.style.display = "block";
+});
+
+// ✅ Add Auto
+addCarBtn.addEventListener("click", async () => {
+    const name = document.getElementById("carName").value;
+    const year = document.getElementById("carYear").value;
+    const price = document.getElementById("carPrice").value;
+    const description = document.getElementById("carDescription").value;
+    const files = document.getElementById("carImages").files;
+
+    if (!name || !year || !price) return alert("Bitte Titel, Jahr und Preis eingeben");
+
+    const imageUrls = [];
+    for (let file of files) {
+        const storageRef = ref(storage, `cars/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        imageUrls.push(url);
+    }
+
+    await addDoc(collection(db, "cars"), {
+        name, year, price, description, images: imageUrls
+    });
+
+    document.getElementById("carName").value = "";
+    document.getElementById("carYear").value = "";
+    document.getElementById("carPrice").value = "";
+    document.getElementById("carDescription").value = "";
+    document.getElementById("carImages").value = "";
+    loadCars();
+});
+
+// ✅ Load Cars
 async function loadCars() {
-  const carList = document.getElementById("carList");
-  carList.innerHTML = "";
-  const snapshot = await db.collection("cars").get();
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    const div = document.createElement("div");
-    div.innerHTML = `
-      <h3>${data.name}</h3>
-      <p>${data.description}</p>
-      <p>Jahr: ${data.year} | Preis: ${data.price}</p>
-      <div>${data.images ? data.images.map(url => `<img src="${url}" width="100">`).join(" ") : ""}</div>
-      <button onclick="deleteCar('${doc.id}')">Löschen</button>
-    `;
-    carList.appendChild(div);
-  });
+    carList.innerHTML = "";
+    const querySnapshot = await getDocs(collection(db, "cars"));
+    querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const li = document.createElement("li");
+        li.classList.add("list-group-item");
+        li.innerHTML = `
+            <strong>${data.name}</strong> (${data.year}) - ${data.price} €<br>
+            ${data.description}<br>
+            ${data.images.map(url => `<img src="${url}" width="100">`).join(' ')}
+            <button class="btn btn-sm btn-danger float-end">Löschen</button>
+        `;
+        const btn = li.querySelector("button");
+        btn.addEventListener("click", async () => {
+            await deleteDoc(doc(db, "cars", docSnap.id));
+            loadCars();
+        });
+        carList.appendChild(li);
+    });
 }
-
-// Auto löschen
-async function deleteCar(id) {
-  if (confirm("Willst du dieses Auto wirklich löschen?")) {
-    await db.collection("cars").doc(id).delete();
-    loadCars();
-  }
-}
-
-// Auto hinzufügen
-document.getElementById("addCarForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const name = document.getElementById("carName").value;
-  const description = document.getElementById("carDescription").value;
-  const year = parseInt(document.getElementById("carYear").value);
-  const price = document.getElementById("carPrice").value;
-
-  const files = document.getElementById("carImages").files;
-  const imageUrls = [];
-
-  for (const file of files) {
-    const storageRef = storage.ref('cars/' + file.name);
-    await storageRef.put(file);
-    const url = await storageRef.getDownloadURL();
-    imageUrls.push(url);
-  }
-
-  await db.collection("cars").add({ name, description, year, price, images: imageUrls });
-  document.getElementById("addCarForm").reset();
-  loadCars();
-});
