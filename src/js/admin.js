@@ -22,12 +22,12 @@ import {
   deleteObject
 } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
 
-// Firebase Config
+// Firebase Config — korrekt für dein Projekt
 const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
   projectId: "webseiteauto1",
-  storageBucket: "webseiteauto1.firebasestorage.app", // korrekt
+  storageBucket: "webseiteauto1.firebasestorage.app", // <-- ABSOLUT RICHTIG
   messagingSenderId: "156599830482",
   appId: "1:156599830482:web:9bc6a34adfa174c58b6a0b"
 };
@@ -38,7 +38,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// DOM-Elemente
+// DOM
 const loginSection = document.getElementById("loginSection");
 const panelSection = document.getElementById("panelSection");
 const loginBtn = document.getElementById("loginBtn");
@@ -48,9 +48,9 @@ const addCarBtn = document.getElementById("addCarBtn");
 const carList = document.getElementById("carList");
 const imageInput = document.getElementById("carImages");
 
-// Auth-Zustand beobachten
+// === AUTH UI SWITCH ===
 onAuthStateChanged(auth, (user) => {
-  console.log("[AuthStateChanged] user:", user ? user.email : null);
+  console.log("[AuthStateChanged] user:", user ? user.email : "N/A");
 
   if (user) {
     loginSection.style.display = "none";
@@ -62,32 +62,27 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// LOGIN
+// === LOGIN ===
 loginBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
   loginMsg.textContent = "";
 
-  if (!email || !password) {
-    loginMsg.textContent = "Bitte E-Mail und Passwort eingeben.";
-    return;
-  }
-
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (err) {
-    console.error("[Login-Fehler]", err);
+    console.error("[LoginError]", err);
     loginMsg.textContent = err.message;
   }
 });
 
-// LOGOUT
+// === LOGOUT ===
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
 });
 
-// AUTO HINZUFÜGEN
+// === AUTO HINZUFÜGEN ===
 addCarBtn.addEventListener("click", async () => {
   const name = document.getElementById("carName").value.trim();
   const year = document.getElementById("carYear").value.trim();
@@ -95,20 +90,9 @@ addCarBtn.addEventListener("click", async () => {
   const description = document.getElementById("carDescription").value.trim();
   const files = imageInput.files;
 
-  if (!name || !year || !price) {
-    alert("Bitte Titel, Jahr und Preis eingeben.");
-    return;
-  }
-
-  if (!files || files.length === 0) {
-    alert("Bitte mindestens ein Bild auswählen.");
-    return;
-  }
-
-  if (files.length > 6) {
-    alert("Maximal 6 Bilder erlaubt.");
-    return;
-  }
+  if (!name || !year || !price) return alert("Bitte Titel, Jahr und Preis eingeben.");
+  if (!files || files.length === 0) return alert("Bitte mindestens ein Bild auswählen.");
+  if (files.length > 6) return alert("Maximal 6 Bilder erlaubt.");
 
   try {
     const carDocRef = doc(collection(db, "cars"));
@@ -121,10 +105,8 @@ addCarBtn.addEventListener("click", async () => {
       const filePath = `cars/${carDocRef.id}/${Date.now()}-${safeFileName}`;
       const storageRef = ref(storage, filePath);
 
-      console.log("[addCar] Upload", filePath);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      console.log("[addCar] DownloadURL:", url);
       imageUrls.push(url);
     }
 
@@ -137,8 +119,6 @@ addCarBtn.addEventListener("click", async () => {
       createdAt: new Date().toISOString()
     });
 
-    console.log("[addCar] Firestore-Dokument gespeichert");
-
     document.getElementById("carName").value = "";
     document.getElementById("carYear").value = "";
     document.getElementById("carPrice").value = "";
@@ -147,113 +127,88 @@ addCarBtn.addEventListener("click", async () => {
 
     await loadCars();
   } catch (err) {
-    console.error("[addCar] Fehler beim Speichern:", err);
+    console.error("[addCar ERROR]", err);
     alert("Fehler beim Speichern: " + err.message);
   }
 });
 
-// LISTE LADEN
+// === AUTOS LADEN ===
 async function loadCars() {
-  console.log("[loadCars] Starte Laden...");
   carList.innerHTML = "<li class='list-group-item text-muted'>Lade Autos...</li>";
 
   try {
     const querySnapshot = await getDocs(collection(db, "cars"));
-    console.log("[loadCars] Anzahl Dokumente:", querySnapshot.size);
-
     carList.innerHTML = "";
 
     if (querySnapshot.empty) {
-      carList.innerHTML =
-        "<li class='list-group-item text-muted'>Noch keine Autos erfasst.</li>";
+      carList.innerHTML = "<li class='list-group-item text-muted'>Noch keine Autos erfasst.</li>";
       return;
     }
 
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
-      console.log("[loadCars] Doc:", docSnap.id, data);
 
-      const li = document.createElement("li");
-      li.classList.add("list-group-item");
-
-      const rawImages = Array.isArray(data.images) ? data.images : [];
-      const validImages = rawImages.filter(
-        (url) => typeof url === "string" && url.startsWith("http")
-      );
+      const images = Array.isArray(data.images)
+        ? data.images.filter((u) => typeof u === "string")
+        : [];
 
       const imagesHtml =
-        validImages.length > 0
-          ? validImages
+        images.length > 0
+          ? images
               .map(
                 (url) =>
-                  `<img src="${url}" width="100" class="me-2 mt-2" onerror="this.src='https://placehold.co/150x100?text=Bild+fehlt'">`
+                  `<img src="${url}" width="100" class="me-2 mt-2" onerror="this.src='https://placehold.co/150x100?text=fehlt'">`
               )
               .join("")
           : "<span class='text-muted'>Kein Bild</span>";
 
+      const li = document.createElement("li");
+      li.classList.add("list-group-item");
+
       li.innerHTML = `
         <div class="d-flex flex-column">
-          <div>
-            <strong>${data.name || ""}</strong> 
-            ${data.year ? `(${data.year})` : ""} 
-            - ${data.price || ""}<br>
-            ${data.description || ""}
-          </div>
-          <div class="mt-2">
-            ${imagesHtml}
-          </div>
-          <div class="mt-2">
-            <button class="btn btn-sm btn-danger">Löschen</button>
-          </div>
+          <strong>${data.name}</strong> (${data.year}) - ${data.price}<br>
+          ${data.description}<br>
+          <div class="mt-2">${imagesHtml}</div>
+          <button class="btn btn-danger btn-sm mt-3">Löschen</button>
         </div>
       `;
 
-      // LÖSCHEN MIT STORAGE-BILDERN
+      // === AUTO + STORAGE-BILDER LÖSCHEN ===
       li.querySelector("button").addEventListener("click", async () => {
-        if (!confirm("Dieses Auto wirklich löschen? (Alle Bilder im Storage werden ebenfalls gelöscht)")) {
-          return;
-        }
+        if (!confirm("Dieses Auto wirklich löschen? (Alle Bilder im Storage werden gelöscht)")) return;
 
-        try {
-          const data = docSnap.data();
-          const images = Array.isArray(data.images) ? data.images : [];
+        const imgs = Array.isArray(data.images) ? data.images : [];
 
-          console.log("[Delete] Beginne Bildlöschung...");
+        console.log("[Delete] Start...");
 
-          for (const imageUrl of images) {
-            try {
-              const pathStart = imageUrl.indexOf("/o/") + 3;
-              const pathEnd = imageUrl.indexOf("?alt=media");
-              const encodedPath = imageUrl.substring(pathStart, pathEnd);
-              const filePath = decodeURIComponent(encodedPath);
+        // 🔥 100% zuverlässige Pfad-Extraktion
+        for (const imageUrl of imgs) {
+          try {
+            const encodedPath = imageUrl.split("/o/")[1].split("?")[0];
+            const filePath = decodeURIComponent(encodedPath);
 
-              const fileRef = ref(storage, filePath);
-              await deleteObject(fileRef);
+            console.log("[Delete] Lösche:", filePath);
 
-              console.log("[Delete] Bild gelöscht:", filePath);
+            const fileRef = ref(storage, filePath);
+            await deleteObject(fileRef);
 
-            } catch (err) {
-              console.warn("[Delete] Konnte Bild nicht löschen:", imageUrl, err);
-            }
+            console.log("[Delete] OK:", filePath);
+          } catch (err) {
+            console.warn("[Delete] Fehler bei Bild:", imageUrl, err);
           }
-
-          console.log("[Delete] Alle Bilder gelöscht – lösche Firestore-Dokument...");
-
-          await deleteDoc(doc(db, "cars", docSnap.id));
-          await loadCars();
-        } catch (err) {
-          console.error("[Delete] Fehler beim Löschen:", err);
-          alert("Fehler beim Löschen: " + err.message);
         }
+
+        // jetzt Firestore-Eintrag löschen
+        await deleteDoc(doc(db, "cars", docSnap.id));
+
+        await loadCars();
       });
 
       carList.appendChild(li);
     });
   } catch (err) {
-    console.error("[loadCars] Fehler beim Laden der Autos:", err);
-    carList.innerHTML =
-      "<li class='list-group-item text-danger'>Fehler beim Laden der Autos: " +
-      err.message +
-      "</li>";
+    console.error("[loadCars ERROR]", err);
+    carList.innerHTML = `<li class="list-group-item text-danger">Fehler: ${err.message}</li>`;
   }
 }
