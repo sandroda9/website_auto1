@@ -49,6 +49,8 @@ const imageInput = document.getElementById("carImages");
 
 // Auth-Zustand beobachten (Seite neu laden etc.)
 onAuthStateChanged(auth, (user) => {
+  console.log("[AuthStateChanged] user:", user ? user.email : null);
+
   if (user) {
     loginSection.style.display = "none";
     panelSection.style.display = "block";
@@ -75,7 +77,7 @@ loginBtn.addEventListener("click", async () => {
     await signInWithEmailAndPassword(auth, email, password);
     // onAuthStateChanged kümmert sich um UI
   } catch (err) {
-    console.error(err);
+    console.error("[Login-Fehler]", err);
     loginMsg.textContent = err.message;
   }
 });
@@ -111,6 +113,7 @@ addCarBtn.addEventListener("click", async () => {
   try {
     // Dokument-Referenz vorab erzeugen
     const carDocRef = doc(collection(db, "cars"));
+    console.log("[addCar] Neue Doc-ID:", carDocRef.id);
 
     // Bilder hochladen
     const imageUrls = [];
@@ -120,8 +123,10 @@ addCarBtn.addEventListener("click", async () => {
       const filePath = `cars/${carDocRef.id}/${Date.now()}-${safeFileName}`;
       const storageRef = ref(storage, filePath);
 
+      console.log("[addCar] Upload", filePath);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
+      console.log("[addCar] DownloadURL:", url);
       imageUrls.push(url);
     }
 
@@ -131,8 +136,10 @@ addCarBtn.addEventListener("click", async () => {
       year,
       price,
       description,
-      images: imageUrls
+      images: imageUrls,
+      createdAt: new Date().toISOString()
     });
+    console.log("[addCar] Firestore-Dokument gespeichert");
 
     // Felder leeren
     document.getElementById("carName").value = "";
@@ -143,57 +150,82 @@ addCarBtn.addEventListener("click", async () => {
 
     await loadCars();
   } catch (err) {
-    console.error(err);
+    console.error("[addCar] Fehler beim Speichern:", err);
     alert("Fehler beim Speichern: " + err.message);
   }
 });
 
 // LISTE LADEN
 async function loadCars() {
-  carList.innerHTML = "";
+  console.log("[loadCars] Starte Laden...");
+  carList.innerHTML = "<li class='list-group-item text-muted'>Lade Autos...</li>";
 
-  const querySnapshot = await getDocs(collection(db, "cars"));
+  try {
+    const querySnapshot = await getDocs(collection(db, "cars"));
+    console.log("[loadCars] Anzahl Dokumente:", querySnapshot.size);
 
-  querySnapshot.forEach((docSnap) => {
-    const data = docSnap.data();
+    carList.innerHTML = "";
 
-    const li = document.createElement("li");
-    li.classList.add("list-group-item");
+    if (querySnapshot.empty) {
+      carList.innerHTML =
+        "<li class='list-group-item text-muted'>Noch keine Autos erfasst.</li>";
+      return;
+    }
 
-    const imagesHtml =
-      data.images && data.images.length > 0
-        ? data.images
-            .map(
-              (url) =>
-                `<img src="${url}" width="100" class="me-2 mt-2" onerror="this.src='https://placehold.co/150x100?text=Bild+fehlt'">`
-            )
-            .join("")
-        : "<span class='text-muted'>Kein Bild</span>";
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      console.log("[loadCars] Doc:", docSnap.id, data);
 
-    li.innerHTML = `
-      <div class="d-flex flex-column">
-        <div>
-          <strong>${data.name || ""}</strong> 
-          ${data.year ? `(${data.year})` : ""} 
-          - ${data.price || ""}<br>
-          ${data.description || ""}
+      const li = document.createElement("li");
+      li.classList.add("list-group-item");
+
+      // Nur gültige Bild-URLs verwenden (String + beginnt mit http)
+      const rawImages = Array.isArray(data.images) ? data.images : [];
+      const validImages = rawImages.filter(
+        (url) => typeof url === "string" && url.startsWith("http")
+      );
+
+      const imagesHtml =
+        validImages.length > 0
+          ? validImages
+              .map(
+                (url) =>
+                  `<img src="${url}" width="100" class="me-2 mt-2" onerror="this.src='https://placehold.co/150x100?text=Bild+fehlt'">`
+              )
+              .join("")
+          : "<span class='text-muted'>Kein Bild</span>";
+
+      li.innerHTML = `
+        <div class="d-flex flex-column">
+          <div>
+            <strong>${data.name || ""}</strong> 
+            ${data.year ? `(${data.year})` : ""} 
+            - ${data.price || ""}<br>
+            ${data.description || ""}
+          </div>
+          <div class="mt-2">
+            ${imagesHtml}
+          </div>
+          <div class="mt-2">
+            <button class="btn btn-sm btn-danger">Löschen</button>
+          </div>
         </div>
-        <div class="mt-2">
-          ${imagesHtml}
-        </div>
-        <div class="mt-2">
-          <button class="btn btn-sm btn-danger">Löschen</button>
-        </div>
-      </div>
-    `;
+      `;
 
-    li.querySelector("button").addEventListener("click", async () => {
-      if (confirm("Dieses Auto wirklich löschen? (Bilder im Storage bleiben vorerst bestehen)")) {
-        await deleteDoc(doc(db, "cars", docSnap.id));
-        await loadCars();
-      }
+      li.querySelector("button").addEventListener("click", async () => {
+        if (confirm("Dieses Auto wirklich löschen? (Bilder im Storage bleiben vorerst bestehen)")) {
+          await deleteDoc(doc(db, "cars", docSnap.id));
+          await loadCars();
+        }
+      });
+
+      carList.appendChild(li);
     });
-
-    carList.appendChild(li);
-  });
+  } catch (err) {
+    console.error("[loadCars] Fehler beim Laden der Autos:", err);
+    carList.innerHTML =
+      "<li class='list-group-item text-danger'>Fehler beim Laden der Autos: " +
+      err.message +
+      "</li>";
+  }
 }
