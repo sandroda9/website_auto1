@@ -22,21 +22,53 @@
     </div>
 
     <!-- Panel -->
-    <div id="panelSection" style="display:none;">
-        <button id="logoutBtn" class="btn btn-danger mb-3">Logout</button>
+    <div id="panelSection" class="card p-4" style="display:none;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">Autos verwalten</h4>
+            <button id="logoutBtn" class="btn btn-danger">Logout</button>
+        </div>
 
-        <h4>Neues Auto hinzufügen</h4>
-        <input type="text" id="carName" class="form-control mb-2" placeholder="Titel">
-        <input type="text" id="carYear" class="form-control mb-2" placeholder="Jahr">
-        <input type="text" id="carPrice" class="form-control mb-2" placeholder="Preis">
-        <textarea id="carDescription" class="form-control mb-2" placeholder="Beschreibung"></textarea>
+        <hr>
 
-        <!-- Bild-URLs statt Datei-Upload -->
-        <input type="text" id="carImageUrls" class="form-control mb-2" placeholder="Bild-URLs (durch Komma getrennt, RAW GitHub URLs)">
+        <h5>Neues Auto hinzufügen</h5>
+
+        <div class="mb-2">
+            <label for="carName" class="form-label">Titel</label>
+            <input type="text" id="carName" class="form-control" placeholder="z.B. VW Golf 1.4 TSI">
+        </div>
+
+        <div class="mb-2">
+            <label for="carYear" class="form-label">Jahr</label>
+            <input type="text" id="carYear" class="form-control" placeholder="z.B. 2018">
+        </div>
+
+        <div class="mb-2">
+            <label for="carPrice" class="form-label">Preis</label>
+            <input type="text" id="carPrice" class="form-control" placeholder="z.B. 12'500 CHF">
+        </div>
+
+        <div class="mb-2">
+            <label for="carDescription" class="form-label">Beschreibung</label>
+            <textarea id="carDescription" class="form-control" rows="3" placeholder="Kurzbeschreibung des Fahrzeugs"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="carImages" class="form-label">Bilder (1–6 Dateien)</label>
+            <input 
+                type="file" 
+                id="carImages" 
+                class="form-control" 
+                accept="image/*" 
+                multiple
+            >
+            <small class="text-muted">Bitte 1 bis 6 Bilder auswählen.</small>
+        </div>
 
         <button id="addCarBtn" class="btn btn-success mb-4">Auto hinzufügen</button>
 
-        <h4>Liste der Autos</h4>
+        <hr>
+
+        <h5>Liste der Autos</h5>
         <ul id="carList" class="list-group"></ul>
     </div>
 </div>

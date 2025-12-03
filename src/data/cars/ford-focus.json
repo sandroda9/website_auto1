@@ -1,9 +1,0 @@
-{
-  "name": "Ford Focus",
-  "description": "Beliebter Kompaktwagen mit sportlichem Fahrverhalten. Wirtschaftlich und praktisch.",
-  "price": "€15.500",
-  "year": 2017,
-  "images": [
-    "src/uploads/ford-focus-1.jpg"
-  ]
-}
