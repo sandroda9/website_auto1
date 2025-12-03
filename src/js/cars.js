@@ -5,12 +5,12 @@ import {
   getDocs 
 } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
-// Firebase Config (dieselbe wie im Admin)
+// Firebase Config (korrigiert wie im Admin)
 const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
   projectId: "webseiteauto1",
-  storageBucket: "webseiteauto1.appspot.com",
+  storageBucket: "webseiteauto1.firebasestorage.app", // ✅ richtig
   messagingSenderId: "156599830482",
   appId: "1:156599830482:web:9bc6a34adfa174c58b6a0b"
 };
@@ -125,13 +125,15 @@ function createCarCard(car, idx) {
   const images = Array.isArray(car.images) ? car.images : [];
   let carouselHTML = '';
 
+  const fallbackImg = "https://placehold.co/400x300?text=Kein+Bild";
+
   if (images.length === 1) {
     carouselHTML = `
       <img 
         src="${images[0]}" 
         alt="${car.name}" 
         class="card-img-top" 
-        onerror="this.src='https://via.placeholder.com/400x300?text=Kein+Bild'">
+        onerror="this.onerror=null; this.src='${fallbackImg}'">
     `;
   } else if (images.length > 1) {
     const indicatorsHTML = images
@@ -151,7 +153,7 @@ function createCarCard(car, idx) {
             src="${image}" 
             alt="${car.name}" 
             class="d-block w-100" 
-            onerror="this.src='https://via.placeholder.com/400x300?text=Kein+Bild'">
+            onerror="this.onerror=null; this.src='${fallbackImg}'">
         </div>
       `)
       .join('');
@@ -175,7 +177,7 @@ function createCarCard(car, idx) {
   } else {
     carouselHTML = `
       <img 
-        src="https://via.placeholder.com/400x300?text=Kein+Bild" 
+        src="${fallbackImg}" 
         alt="${car.name}" 
         class="card-img-top">
     `;
