@@ -26,7 +26,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
   projectId: "webseiteauto1",
-  storageBucket: "webseiteauto1.appspot.com",
+  storageBucket: "webseiteauto1.firebasestorage.app", // ✅ richtiger Bucket
   messagingSenderId: "156599830482",
   appId: "1:156599830482:web:9bc6a34adfa174c58b6a0b"
 };
@@ -165,7 +165,7 @@ async function loadCars() {
         ? data.images
             .map(
               (url) =>
-                `<img src="${url}" width="100" class="me-2 mt-2" onerror="this.src='https://via.placeholder.com/150x100?text=Bild+fehlt'">`
+                `<img src="${url}" width="100" class="me-2 mt-2" onerror="this.src='https://placehold.co/150x100?text=Bild+fehlt'">`
             )
             .join("")
         : "<span class='text-muted'>Kein Bild</span>";
