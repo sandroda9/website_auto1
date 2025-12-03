@@ -18,7 +18,8 @@ import {
   getStorage,
   ref,
   uploadBytes,
-  getDownloadURL
+  getDownloadURL,
+  deleteObject
 } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-storage.js";
 
 // Firebase Config
@@ -26,7 +27,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDuu5uniSbFQ5JErWWoQrsyHAoI1XlkaWA",
   authDomain: "webseiteauto1.firebaseapp.com",
   projectId: "webseiteauto1",
-  storageBucket: "webseiteauto1.firebasestorage.app", // ✅ richtiger Bucket
+  storageBucket: "webseiteauto1.firebasestorage.app", // korrekt
   messagingSenderId: "156599830482",
   appId: "1:156599830482:web:9bc6a34adfa174c58b6a0b"
 };
@@ -47,7 +48,7 @@ const addCarBtn = document.getElementById("addCarBtn");
 const carList = document.getElementById("carList");
 const imageInput = document.getElementById("carImages");
 
-// Auth-Zustand beobachten (Seite neu laden etc.)
+// Auth-Zustand beobachten
 onAuthStateChanged(auth, (user) => {
   console.log("[AuthStateChanged] user:", user ? user.email : null);
 
@@ -75,7 +76,6 @@ loginBtn.addEventListener("click", async () => {
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    // onAuthStateChanged kümmert sich um UI
   } catch (err) {
     console.error("[Login-Fehler]", err);
     loginMsg.textContent = err.message;
@@ -87,7 +87,7 @@ logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
 });
 
-// AUTO HINZUFÜGEN (mit Upload zu Firebase Storage)
+// AUTO HINZUFÜGEN
 addCarBtn.addEventListener("click", async () => {
   const name = document.getElementById("carName").value.trim();
   const year = document.getElementById("carYear").value.trim();
@@ -111,11 +111,9 @@ addCarBtn.addEventListener("click", async () => {
   }
 
   try {
-    // Dokument-Referenz vorab erzeugen
     const carDocRef = doc(collection(db, "cars"));
     console.log("[addCar] Neue Doc-ID:", carDocRef.id);
 
-    // Bilder hochladen
     const imageUrls = [];
 
     for (const file of files) {
@@ -130,7 +128,6 @@ addCarBtn.addEventListener("click", async () => {
       imageUrls.push(url);
     }
 
-    // Dokument in Firestore speichern
     await setDoc(carDocRef, {
       name,
       year,
@@ -139,9 +136,9 @@ addCarBtn.addEventListener("click", async () => {
       images: imageUrls,
       createdAt: new Date().toISOString()
     });
+
     console.log("[addCar] Firestore-Dokument gespeichert");
 
-    // Felder leeren
     document.getElementById("carName").value = "";
     document.getElementById("carYear").value = "";
     document.getElementById("carPrice").value = "";
@@ -179,7 +176,6 @@ async function loadCars() {
       const li = document.createElement("li");
       li.classList.add("list-group-item");
 
-      // Nur gültige Bild-URLs verwenden (String + beginnt mit http)
       const rawImages = Array.isArray(data.images) ? data.images : [];
       const validImages = rawImages.filter(
         (url) => typeof url === "string" && url.startsWith("http")
@@ -212,10 +208,42 @@ async function loadCars() {
         </div>
       `;
 
+      // LÖSCHEN MIT STORAGE-BILDERN
       li.querySelector("button").addEventListener("click", async () => {
-        if (confirm("Dieses Auto wirklich löschen? (Bilder im Storage bleiben vorerst bestehen)")) {
+        if (!confirm("Dieses Auto wirklich löschen? (Alle Bilder im Storage werden ebenfalls gelöscht)")) {
+          return;
+        }
+
+        try {
+          const data = docSnap.data();
+          const images = Array.isArray(data.images) ? data.images : [];
+
+          console.log("[Delete] Beginne Bildlöschung...");
+
+          for (const imageUrl of images) {
+            try {
+              const pathStart = imageUrl.indexOf("/o/") + 3;
+              const pathEnd = imageUrl.indexOf("?alt=media");
+              const encodedPath = imageUrl.substring(pathStart, pathEnd);
+              const filePath = decodeURIComponent(encodedPath);
+
+              const fileRef = ref(storage, filePath);
+              await deleteObject(fileRef);
+
+              console.log("[Delete] Bild gelöscht:", filePath);
+
+            } catch (err) {
+              console.warn("[Delete] Konnte Bild nicht löschen:", imageUrl, err);
+            }
+          }
+
+          console.log("[Delete] Alle Bilder gelöscht – lösche Firestore-Dokument...");
+
           await deleteDoc(doc(db, "cars", docSnap.id));
           await loadCars();
+        } catch (err) {
+          console.error("[Delete] Fehler beim Löschen:", err);
+          alert("Fehler beim Löschen: " + err.message);
         }
       });
 
